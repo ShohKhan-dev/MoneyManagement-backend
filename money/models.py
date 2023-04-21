@@ -41,13 +41,6 @@ class Tag(models.Model):
         return self.name
 
 
-class Category(models.Model):
-    name = models.CharField(max_length=100)
-    
-    def __str__(self):
-        return self.name
-
-
 class Transaction(models.Model):
     TRANSACTION_TYPES = [
         ('income', 'Income'),
@@ -59,7 +52,6 @@ class Transaction(models.Model):
     datetime = models.DateTimeField()
     transaction_type = models.CharField(max_length=7, choices=TRANSACTION_TYPES)
     description = models.TextField(null=True, blank=True)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='transactions')
     tag = models.ManyToManyField(Tag, blank=True, null=True)
 
     def __str__(self):

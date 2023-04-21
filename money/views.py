@@ -5,18 +5,13 @@ from rest_framework.permissions import AllowAny, IsAdminUser
 from django_filters import rest_framework as filters
 
 # Project
-from money.serializers import TagSerializer, CategorySerializer, TransactionSerializer
-from money.models import Tag, Category, Transaction
+from money.serializers import TagSerializer, TransactionSerializer
+from money.models import Tag, Transaction
 
 
 class TagViewSet(ModelViewSet):
     serializer_class = TagSerializer
     queryset = Tag.objects.all()
-
-class CategoryViewSet(ModelViewSet):
-    serializer_class = CategorySerializer
-    queryset = Category.objects.all()
-
 
 
 class TransactionViewSet(ModelViewSet):
@@ -27,4 +22,4 @@ class TransactionViewSet(ModelViewSet):
 
 
 
-__all__ = ['TagViewSet', 'CategoryViewSet', 'TransactionViewSet']
+__all__ = ['TagViewSet', 'TransactionViewSet']
