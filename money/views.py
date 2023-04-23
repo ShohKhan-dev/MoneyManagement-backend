@@ -13,7 +13,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth import authenticate, get_user_model, login
 
 from rest_framework.authentication import TokenAuthentication
 
@@ -28,6 +28,10 @@ def login_view(request):
     password = request.data.get('password')
     user = authenticate(request, email=email, password=password)
     if user is not None:
+        login(request, user)
+        # Update session with user's ID
+        request.session['user_id'] = user.id
+
         token, created = Token.objects.get_or_create(user=user)
         return Response({'token': token.key})
     else:
@@ -48,6 +52,10 @@ def registration_view(request):
 
         # generate token upon successful registration
         if user is not None:
+            login(request, user)
+            # Update session with user's ID
+            request.session['user_id'] = user.id
+
             token, created = Token.objects.get_or_create(user=user)
             return Response({'token': token.key}, status=status.HTTP_201_CREATED)
         else:
