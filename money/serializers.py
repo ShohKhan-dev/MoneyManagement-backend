@@ -1,6 +1,29 @@
 # serializers.py
 from rest_framework import serializers
 from .models import Tag, Transaction
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+class UserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+
+    def create(self, validated_data):
+        user = User.objects.create(
+            email=validated_data['email'],
+            first_name=validated_data['first_name'],
+            last_name=validated_data['last_name'],
+        )
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
+
+    class Meta:
+        model = User
+        fields = ('id', 'email', 'first_name', 'last_name', 'password')
+        read_only_fields = ('id',)
+
+
 
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
@@ -13,7 +36,7 @@ class TransactionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Transaction
-        fields = ['id', 'title', 'amount', 'datetime', 'transaction_type', 'description', 'tag']
+        fields = ['id', 'title', 'amount', 'author', 'datetime', 'transaction_type', 'description', 'tag']
     
     def create(self, validated_data):
         tags_data = validated_data.pop('tag', None)
