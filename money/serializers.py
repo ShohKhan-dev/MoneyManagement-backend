@@ -33,14 +33,17 @@ class TagSerializer(serializers.ModelSerializer):
 class TransactionSerializer(serializers.ModelSerializer):
     # tag = serializers.PrimaryKeyRelatedField(queryset=Tag.objects.all(), many=True)
     tag = TagSerializer(many=True, required=False)
+    author = serializers.ReadOnlyField(source='author.id')
 
     class Meta:
         model = Transaction
-        fields = ['id', 'title', 'amount', 'author', 'datetime', 'transaction_type', 'description', 'tag']
+        fields = ['id', 'title', 'amount', 'datetime', 'author', 'transaction_type', 'description', 'tag']
     
     def create(self, validated_data):
+
         tags_data = validated_data.pop('tag', None)
         transaction = Transaction.objects.create(**validated_data)
+
         if tags_data:
             tags = []
             for tag_data in tags_data:

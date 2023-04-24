@@ -14,12 +14,23 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from django.contrib.auth import authenticate, get_user_model, login
-
+from rest_framework.exceptions import ValidationError
 from rest_framework.authentication import TokenAuthentication
-
+from rest_framework.views import APIView
 
 
 User = get_user_model()
+
+
+class UserView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
+
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -64,6 +75,7 @@ def registration_view(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+
 class LogoutView(ObtainAuthToken):
 
     authentication_classes = [TokenAuthentication]
@@ -99,7 +111,13 @@ class TransactionViewSet(ModelViewSet):
         return queryset
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        user = self.request.user
+        print(user)
+        if user.is_authenticated:
+            serializer.save(author=user)
+        else:
+            raise ValidationError('User is not authenticated')
+
 
 
 
